@@ -1,0 +1,114 @@
+% Video frame dimensions
+videoFrameWidth  = 720.0
+videoFrameHeight = 576.0
+
+% Standard billboard width * height in world metric
+billboardWidth = 0.45
+billboardHeight = 2.0
+stdTexWidth = 1.0
+stdTexHeight = 1.2
+
+% Number of cameras for this data set
+numCameras = 3
+
+% Cameras parameters
+camera1Eye    = -14.33816,  0.62856,  1.88411
+camera1Center = -13.37564,  0.78316,  1.66129
+camera1Up     =   0.22104,  0.02887,  0.97484
+camera1FOV    =  43.73000
+
+camera2Eye     =  -2.73796, 10.15088,  6.10694
+camera2Center  =  -2.61659,  9.32649,  5.55409
+camera2Up      =   0.08052, -0.54695,  0.83328
+camera2FOV     =  43.80000
+
+camera3Eye    =  15.88847,  7.89012,  5.51554
+camera3Center =  15.09783,  7.41623,  5.12783
+camera3Up     =  -0.33256, -0.19933,  0.92178
+camera3FOV    =  39.15000
+
+% Perspective correction matrix
+cmReductionFactor = 2.0
+correctionMat1 = ../../scenedata/pets2006/detection-data/cam1-correction.txt
+correctionMat2 = ../../scenedata/pets2006/detection-data/cam3-correction.txt
+correctionMat3 = ../../scenedata/pets2006/detection-data/cam4-correction.txt
+
+% Reference plane to camera homographies
+refToCam1 = ../../scenedata/pets2006/detection-data/homography-mat_ref_to_cam1.dat
+refToCam2 = ../../scenedata/pets2006/detection-data/homography-mat_ref_to_cam3.dat
+refToCam3 = ../../scenedata/pets2006/detection-data/homography-mat_ref_to_cam4.dat
+
+% Any camera to world correspondencies
+whichCamera = 2
+
+p0camera = 212.0, 105.0
+p1camera = 167.0, 143.0
+p2camera = 309.0, 122.0
+p3camera = 248.0, 163.0
+
+p0world = 0.00, 0.00
+p1world = 4.83, 0.63
+p2world = 0.00, 4.25
+p3world = 4.83, 3.64
+
+% Starting and ending frame number
+% 1500 2000
+startingFrame = 1510
+endingFrame = 1600
+
+% Video Frames per Second
+framesPerSecond = 20
+
+% Visibility data
+visibilityDataPath = ./pets2006vis.dat
+
+% Path for video frames
+% first  %d - camera number starting from 0
+% second %d - frame number
+videoPath = ../../scenedata/pets2006/frames/%d/S7-T6-B.%05d.jpeg
+
+% Path for foreground mask frames
+% first  %d - camera number starting from 0
+% second %d - frame number
+maskPath = ../../scenedata/pets2006/frames/m%d/mask-%04d.png
+
+% Path for object detection data
+% first %d - frame number
+objectDataPath = ../../scenedata/pets2006/tracking_data_pets06/filtered_gpoints.conf
+
+
+% -----------------------------------------------------------------------------
+% Scene Model description
+% -----------------------------------------------------------------------------
+
+% Model components
+model = Floor, Wall
+
+% Textures paths
+texWall  = wall.jpg
+texFloor = floor.jpg
+
+% Floor description
+v0Floor =   7.86,  6.67, 0.0
+v1Floor = -10.29,  6.67, 0.0
+v2Floor = -10.29, -0.56, 0.0
+v3Floor =   7.86, -0.56, 0.0
+
+t0Floor = 0.0, 0.0
+t1Floor = 1.0, 0.0
+t2Floor = 1.0, 1.0
+t3Floor = 0.0, 1.0
+
+% Wall description
+v0Wall  =   7.86, -0.56, 0.0
+v1Wall  = -10.29, -0.56, 0.0
+v2Wall  = -10.29, -0.56, 4.2
+v3Wall  =   7.86, -0.56, 4.2
+
+t0Wall  =   0.0, 0.0
+t1Wall  =   1.0, 0.0
+t2Wall  =   1.0, 1.0
+t3Wall  =   0.0, 1.0
+
+
+

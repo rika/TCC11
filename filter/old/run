@@ -1,0 +1,3 @@
+#! /bin/bash -v
+
+python filter.py ../../scenedata/pets2006/tracking_data_pets06/gpoints.conf 1510 2999 -a
