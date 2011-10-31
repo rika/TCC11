@@ -91,7 +91,7 @@ class Data:
             # Get objects of the frame
             objects = []
             for _i in range(n):
-                s = re.search('(\d+)\s(\d+.?\d*)\s(\d+)\s(\d+)$', lines[0])
+                s = re.search('(\d+)\s(\d+.?\d*)\s(-?\d+)\s(-?\d+)$', lines[0])
                 lines = lines[1:]
                 subject = int(s.group(1))
                 height = float(s.group(2))

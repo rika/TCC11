@@ -14,23 +14,29 @@ using namespace std;
 
 int main() {
 
-    FilterData * data;
-    data = new FilterData(FILENAME, START_FRAME, END_FRAME);
-
+    FilterData data(FILENAME, START_FRAME, END_FRAME);
+/*
     for (int i = START_FRAME; i <= END_FRAME; i++) {
         cout << "frame " << i << ": " << endl;
-        list<Object> l = data->get(i);
-        list<Object>::iterator j;
-        for (j = l.begin(); j != l.end(); j++) {
-            cout << " " << (*j).subject;
-            //cout << " (" << (*j).x << "," << (*j).y << ")";
+        list<Object> l = data.get(i);
+        list<Object>::iterator it;
+        for (it = l.begin(); it != l.end(); it++) {
+            cout << " " << (*it).subject;
         }
         cout << endl;
     }
+*/
+    Object obj = data.getStart();
+    cout << "start " << obj.subject << " at: (" << obj.coord.x << "," << obj.coord.y << ")" << endl;
+    for (int i = obj.frame; i < obj.frame+5; i++) {
+        cout << " frame: " << i << endl;
+        list<Object> l = data.get(i);
+        list<Object>::iterator it;
+        for (it = l.begin(); it != l.end(); it++)
+            cout << "  (" << (*it).coord.x << "," << (*it).coord.y << ")" << endl;
+    }
 
     cout << "done??" << endl;
-
-    delete data;
 
     return 0;
 }

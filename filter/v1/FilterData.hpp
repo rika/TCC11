@@ -12,11 +12,12 @@ private:
     int currentFrame, start, end;
     bool forward;
     list<Object> * frameObjects;
+    bool isStart(Object obj);
 
 public:
     FilterData(string filePath, int startFrame, int endFrame);
     ~FilterData();
-    Object * getStart();
+    Object getStart();
     void remove(list<Object>);
     list<Object> get(int frame);
 };

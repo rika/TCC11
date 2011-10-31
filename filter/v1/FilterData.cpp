@@ -48,8 +48,51 @@ FilterData::~FilterData() {
     if (frameObjects) delete[] frameObjects;
 }
 
-Object * FilterData::getStart() {
+#define TWIN_SIZE 5
+#define WIN_DIST 100
 
+float dist (Object a, Object b) {
+    int dx = a.coord.x - b.coord.x;
+    int dy = a.coord.y - b.coord.y;
+    return sqrt(dx*dx + dy*dy);
+}
+
+bool FilterData::isStart(Object obj) {
+    cout << " isStart(" << obj.subject << ")" << endl;
+    list<Object>::iterator it;
+    cout << "  frame: " << obj.frame << endl;
+    int frame = obj.frame-start;
+    for (it = frameObjects[frame].begin(); it != frameObjects[frame].end(); it++) {
+        cout << "  comparing with: " << (*it).subject << endl;
+        if (obj.subject != (*it).subject && dist(obj, *it) < WIN_DIST)
+            return false;
+    }
+
+    Object * p;
+    Object * q;
+    p = &obj;
+
+    for (frame = obj.frame-start+1; frame < obj.frame-start+TWIN_SIZE; frame++) {
+        cout << "  frame: " << frame+start << endl;
+        for (it = frameObjects[frame].begin(); it != frameObjects[frame].end(); it++) {
+            cout << "  comparing with: " << (*it).subject << endl;
+            q = NULL;
+            if (dist(*p, *it) < WIN_DIST) {
+                if (q != NULL) return false;
+                q = &(*it);
+            }
+        }
+    }
+    return true;
+}
+
+Object FilterData::getStart() {
+    for (int i = 0; i <= end-start-(TWIN_SIZE-1); i++) {
+        cout << "frame: " << i << endl;
+        list<Object>::iterator it;
+        for (it = frameObjects[i].begin(); it != frameObjects[i].end(); it++)
+            if (isStart(*it)) return *it;
+    }
 }
 
 void FilterData::remove(list<Object>) {
