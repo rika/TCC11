@@ -91,8 +91,9 @@ Object FilterData::getStart() {
         cout << "frame: " << i << endl;
         list<Object>::iterator it;
         for (it = frameObjects[i].begin(); it != frameObjects[i].end(); it++)
-            if (isStart(*it)) return *it;
+            if (isStart(*it)) return &(*it);
     }
+    return NULL;
 }
 
 void FilterData::remove(list<Object>) {

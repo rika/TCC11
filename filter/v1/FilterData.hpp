@@ -17,7 +17,7 @@ private:
 public:
     FilterData(string filePath, int startFrame, int endFrame);
     ~FilterData();
-    Object getStart();
+    Object * getStart();
     void remove(list<Object>);
     list<Object> get(int frame);
 };
