@@ -5,19 +5,20 @@
 #include <string>
 #include "Object.hpp" 
 
+using namespace std;
+
 class FilterData {
 private:
-    int currentFrame;
+    int currentFrame, start, end;
     bool forward;
-    list<Object>[] frameObjects;
+    list<Object> * frameObjects;
 
 public:
     FilterData(string filePath, int startFrame, int endFrame);
     ~FilterData();
     Object * getStart();
-    Object * locate(cv::Point predict);
-    bool isFinished();
     void remove(list<Object>);
+    list<Object> get(int frame);
 };
 
 #endif

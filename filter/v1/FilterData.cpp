@@ -6,24 +6,23 @@
 
 using namespace std;
 
-FilterData::FilterData(string filePath int startFrame, int endFrame) {
+FilterData::FilterData(string filePath, int startFrame, int endFrame) {
 
     ifstream infile;
-    int start, end;
     int n, subject, x, y;
     float height;
 
     // open file    
     infile.open(filePath.c_str());
     if (!infile.is_open()) {
-        cout << "Could not open: " << filePath << endl;
+        cout << "FilterData: Could not open: " << filePath << endl;
         exit(-1);
     }
 
     // check frames range
     infile >> start >> end;
     if (startFrame < start or endFrame > end) {
-        cout << "Frames out of range of the tracking data" << endl;
+        cout << "FilterData: Frames out of range of the tracking data" << endl;
         infile.close();
         exit(-1);
     }
@@ -40,22 +39,27 @@ FilterData::FilterData(string filePath int startFrame, int endFrame) {
             }
         }
     }
+    this->start = startFrame;
+    this->end = endFrame;
     infile.close();
 }
 
 FilterData::~FilterData() {
-    if (frameObjects) delete frameObjects;
+    if (frameObjects) delete[] frameObjects;
 }
 
-Object FilterData::getStart() {
-
-}
-
-Object locate(cv::Point predict) {
+Object * FilterData::getStart() {
 
 }
 
 void FilterData::remove(list<Object>) {
 }
 
-
+list<Object> FilterData::get(int frame) {
+    if (frame < start || frame > end) {
+        cout << "FilterData.get: Invalid frame " << frame << endl;
+        exit(-1);
+    }
+    //cout << frame << " " << start << " " << end << endl;
+    return frameObjects[frame - start];
+}

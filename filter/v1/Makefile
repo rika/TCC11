@@ -2,8 +2,8 @@ CFLAGS = `pkg-config opencv --cflags`
 LIBS   = `pkg-config opencv --libs`
 CC     = g++
 
-SRCS = main.cpp
-OBJS = main.o
+SRCS = main.cpp Object.cpp FilterData.cpp
+OBJS = main.o Object.o FilterData.o
 
 all: main
 
@@ -22,6 +22,6 @@ depend:
 clean:
 	rm main *.o
 
-main.o: condensation.h
-condensation.o: condensation.h SampleStat.h
-
+main.o: Object.hpp FilterData.hpp
+Object.o: Object.hpp
+FilterData.o: Object.hpp FilterData.hpp
