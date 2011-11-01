@@ -146,8 +146,9 @@ try:
         for obj in objects:
             sim.add(obj)
         root.update() # redraw
-        time.sleep(1.0/20)
-#sys.stdin.readline()
+        #time.sleep(1.0/20)
+        print frame
+        sys.stdin.readline()
 except TclError:
     pass # to avoid errors when the window is closed
 

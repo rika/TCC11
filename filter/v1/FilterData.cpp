@@ -49,8 +49,8 @@ FilterData::~FilterData() {
     if (frameObjects) delete[] frameObjects;
 }
 
-#define TWIN_SIZE 5
-#define WIN_DIST 100
+#define TWIN_SIZE 10
+#define WIN_DIST 50
 
 float dist (Object a, Object b) {
     int dx = a.coord.x - b.coord.x;

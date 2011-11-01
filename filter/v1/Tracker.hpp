@@ -15,7 +15,7 @@ using namespace std;
 class Tracker {
     private:
     int id;
-    int startFrame;
+    Object * initObj;
     CvConDensation * conDenF;
     CvConDensation * conDenB;
     void trackAux(CvConDensation * con, FilterData * data, int step);
