@@ -8,3 +8,10 @@ Object::Object (int frame, int subject, int x, int y, float height) {
     this->height = height;
 }
 
+bool Object::operator== (Object obj) {
+    return (this->frame == obj.frame) &&
+        (this->subject == obj.subject) &&
+        (this->coord == obj.coord);
+        // height == 1.0
+}
+

@@ -11,6 +11,7 @@ class Object {
     float height;
 
     Object (int frame, int subject, int x, int y, float height);
+    bool operator== (Object obj);
 };
 
 #endif

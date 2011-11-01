@@ -29,6 +29,7 @@ FilterData::FilterData(string filePath, int startFrame, int endFrame) {
 
     // read and store data
     frameObjects = new list<Object>[endFrame - startFrame + 1];
+    resultObjects = new list<Object>[endFrame - startFrame + 1];
     for (int frame = start; frame <= end && frame <= endFrame; frame++) {
         infile >> n;
         for (int j = 0; j < n; j++) {
@@ -58,12 +59,12 @@ float dist (Object a, Object b) {
 }
 
 bool FilterData::isStart(Object obj) {
-    cout << " isStart(" << obj.subject << ")" << endl;
+    //cout << " isStart(" << obj.subject << ")" << endl;
     list<Object>::iterator it;
-    cout << "  frame: " << obj.frame << endl;
+    //cout << "  frame: " << obj.frame << endl;
     int frame = obj.frame-start;
     for (it = frameObjects[frame].begin(); it != frameObjects[frame].end(); it++) {
-        cout << "  comparing with: " << (*it).subject << endl;
+        //cout << "  comparing with: " << (*it).subject << endl;
         if (obj.subject != (*it).subject && dist(obj, *it) < WIN_DIST)
             return false;
     }
@@ -73,9 +74,9 @@ bool FilterData::isStart(Object obj) {
     p = &obj;
 
     for (frame = obj.frame-start+1; frame < obj.frame-start+TWIN_SIZE; frame++) {
-        cout << "  frame: " << frame+start << endl;
+        //cout << "  frame: " << frame+start << endl;
         for (it = frameObjects[frame].begin(); it != frameObjects[frame].end(); it++) {
-            cout << "  comparing with: " << (*it).subject << endl;
+            //cout << "  comparing with: " << (*it).subject << endl;
             q = NULL;
             if (dist(*p, *it) < WIN_DIST) {
                 if (q != NULL) return false;
@@ -86,17 +87,14 @@ bool FilterData::isStart(Object obj) {
     return true;
 }
 
-Object FilterData::getStart() {
+Object * FilterData::getStart() {
     for (int i = 0; i <= end-start-(TWIN_SIZE-1); i++) {
-        cout << "frame: " << i << endl;
+        //cout << "frame: " << i << endl;
         list<Object>::iterator it;
         for (it = frameObjects[i].begin(); it != frameObjects[i].end(); it++)
             if (isStart(*it)) return &(*it);
     }
     return NULL;
-}
-
-void FilterData::remove(list<Object>) {
 }
 
 list<Object> FilterData::get(int frame) {
@@ -106,4 +104,34 @@ list<Object> FilterData::get(int frame) {
     }
     //cout << frame << " " << start << " " << end << endl;
     return frameObjects[frame - start];
+}
+
+void FilterData::update(list<Object> trackedSet, list<Object> predictSet) {
+    list<Object>::iterator it;
+    for (it = trackedSet.begin(); it != trackedSet.end(); it++) {
+        cout << "Removing (" << (*it).coord.x << "," << (*it).coord.y << ") at frame " << (*it).frame << endl;
+        frameObjects[(*it).frame-start].remove(*it);
+    }
+    for (it = predictSet.begin(); it != predictSet.end(); it++)
+        resultObjects[(*it).frame-start].push_back(*it);
+}
+
+void FilterData::writeResult(string filePath) {
+    ofstream outfile;
+
+    outfile.open(filePath.c_str(), ios::out);
+    if (!outfile.is_open()) {
+        cout << "FilterData: Could not open: " << filePath << endl;
+        exit(-1);
+    }
+
+    outfile << start << " " << end << endl;
+    for (int frame = start; frame <= end; frame++) {
+        list<Object> l = resultObjects[frame-start];
+        list<Object>::iterator it;
+        outfile << l.size() << endl;
+        for (it = l.begin(); it != l.end(); it++)
+            outfile << (*it).subject << " " << (*it).height << " " << (*it).coord.x << " " << (*it).coord.y << endl;
+    }
+    outfile.close();
 }

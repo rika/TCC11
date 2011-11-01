@@ -8,18 +8,21 @@
 using namespace std;
 
 class FilterData {
-private:
-    int currentFrame, start, end;
+    private:
+    int currentFrame;
     bool forward;
     list<Object> * frameObjects;
+    list<Object> * resultObjects;
     bool isStart(Object obj);
 
-public:
+    public:
+    int start, end;
     FilterData(string filePath, int startFrame, int endFrame);
     ~FilterData();
     Object * getStart();
-    void remove(list<Object>);
     list<Object> get(int frame);
+    void update(list<Object> trackedSet, list<Object> predictSet);
+    void writeResult(string filePath);
 };
 
 #endif
