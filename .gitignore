@@ -1,5 +1,7 @@
 *.o
 main
+BGPets
+background
 *.swp
 out.conf
 teste*

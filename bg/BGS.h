@@ -49,7 +49,7 @@ class BGS
   void SetMinMaxGap(int min, int max) { iMinGap = min; iMaxGap = max; };
   void SetHGap (int h) {hGap = h;};
 
-  void Show (vector<Mat> imgN, char *w1, char *w2, char *w3) {
+  void Show (vector<Mat> imgN, const char *w1, const char *w2, const char *w3) {
     imshow ( w1, imgN[0] );
     imshow ( w2, imgN[1] );
     imshow ( w3, imgN[2] );
