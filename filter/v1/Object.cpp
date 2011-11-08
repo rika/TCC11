@@ -3,6 +3,9 @@
 #include <iostream>
 using namespace std;
 
+Object::Object () {
+}
+
 Object::Object (int frame, int subject, int x, int y, float height) {
     this->frame = frame;
     this->subject = subject;
@@ -22,3 +25,16 @@ bool Object::operator== (Object obj) {
         // height == 1.0
 }
 
+Object Object::operator= (Object obj) {
+    this->frame = obj.frame;
+    this->subject = obj.subject;
+    this->coord = obj.coord;
+    this->height = obj.height;
+    return obj;
+}
+
+float dist (Object a, Object b) {
+    int dx = a.coord.x - b.coord.x;
+    int dy = a.coord.y - b.coord.y;
+    return sqrt(dx*dx + dy*dy);
+}

@@ -10,9 +10,13 @@ class Object {
     cv::Point coord;
     float height;
 
+    Object ();
     Object (int frame, int subject, int x, int y, float height);
     bool operator== (Object obj);
+    Object operator= (Object obj);
 };
+
+float dist (Object a, Object b);
 
 #endif
 

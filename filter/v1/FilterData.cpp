@@ -4,6 +4,9 @@
 
 #include "FilterData.hpp"
 
+#define TWIN_SIZE 10
+#define WIN_DIST 50
+
 using namespace std;
 
 FilterData::FilterData(string filePath, int startFrame, int endFrame) {
@@ -47,15 +50,6 @@ FilterData::FilterData(string filePath, int startFrame, int endFrame) {
 
 FilterData::~FilterData() {
     if (frameObjects) delete[] frameObjects;
-}
-
-#define TWIN_SIZE 10
-#define WIN_DIST 50
-
-float dist (Object a, Object b) {
-    int dx = a.coord.x - b.coord.x;
-    int dy = a.coord.y - b.coord.y;
-    return sqrt(dx*dx + dy*dy);
 }
 
 bool FilterData::isStart(Object obj) {

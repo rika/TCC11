@@ -17,30 +17,6 @@ using namespace std;
 int main() {
 
     FilterData data(INFILE, START_FRAME, END_FRAME);
-/*
-    // LISTAGEM DOS ELEMENTOS DE CADA FRAME
-    for (int i = START_FRAME; i <= END_FRAME; i++) {
-        cout << "frame " << i << ": " << endl;
-        list<Object> l = data.get(i);
-        list<Object>::iterator it;
-        for (it = l.begin(); it != l.end(); it++) {
-            cout << " " << (*it).subject;
-        }
-        cout << endl;
-    }
-*/
-/*
-    // 1 START E LISTAGEM DOS OBJETOS NA JANELA TEMPORAL
-    Object obj = data.getStart();
-    cout << "start " << obj.subject << " at: (" << obj.coord.x << "," << obj.coord.y << ")" << endl;
-    for (int i = obj.frame; i < obj.frame+5; i++) {
-        cout << " frame: " << i << endl;
-        list<Object> l = data.get(i);
-        list<Object>::iterator it;
-        for (it = l.begin(); it != l.end(); it++)
-            cout << "  (" << (*it).coord.x << "," << (*it).coord.y << ")" << endl;
-    }
-*/
 
     int id = 0;
     Object * obj_pt;
