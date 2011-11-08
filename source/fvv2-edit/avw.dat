@@ -34,16 +34,16 @@ camera4FOV    =  39.15000
 
 % Perspective correction matrix
 cmReductionFactor = 1.0
-correctionMat1 = ./avw/correction/cam1-correction.txt
-correctionMat2 = ./avw/correction/cam2-correction.txt
-correctionMat3 = ./avw/correction/cam3-correction.txt
-correctionMat4 = ./avw/correction/cam4-correction.txt
+correctionMat1 = ../../../scenedata/avw/correction/cam1-correction.txt
+correctionMat2 = ../../../scenedata/avw/correction/cam2-correction.txt
+correctionMat3 = ../../../scenedata/avw/correction/cam3-correction.txt
+correctionMat4 = ../../../scenedata/avw/correction/cam4-correction.txt
 
 % Reference plane to camera homographies
-refToCam1 = ./avw/homography/homography-mat_ground_to_cam1.dat
-refToCam2 = ./avw/homography/homography-mat_ground_to_cam2.dat
-refToCam3 = ./avw/homography/homography-mat_ground_to_cam3.dat
-refToCam4 = ./avw/homography/homography-mat_ground_to_cam4.dat
+refToCam1 = ../../../scenedata/avw/homography/homography-mat_ground_to_cam1.dat
+refToCam2 = ../../../scenedata/avw/homography/homography-mat_ground_to_cam2.dat
+refToCam3 = ../../../scenedata/avw/homography/homography-mat_ground_to_cam3.dat
+refToCam4 = ../../../scenedata/avw/homography/homography-mat_ground_to_cam4.dat
 
 % Any camera to world correspondencies
 whichCamera = 2
@@ -59,8 +59,10 @@ p2world = 0.00, 1.00
 p3world = 1.00, 1.00
 
 % Starting and ending frame number
+% startingFrame = 7000
+% endingFrame   = 8200
 startingFrame = 7000
-endingFrame   = 8200
+endingFrame   = 7100
 
 % Path for video frames
 % Video Frames per Second
@@ -68,16 +70,16 @@ framesPerSecond = 20
 
 % first  %d - camera number starting from 0
 % second %d - frame number
-videoPath = ../../scenedata/avw/frames/cam%d/%d.jpg
+videoPath = ../../../scenedata/avw/frames/cam%d/%d.jpg
 
 % Path for foreground mask frames
 % first  %d - camera number starting from 0
 % second %d - frame number
-maskPath = ../../scenedata/avw/foreground/cam%d/%d.jpg
+maskPath = ../../../scenedata/avw/foreground/cam%d/%d.jpg
 
 % Path for object detection data
 % first %d - frame number
-objectDataPath = ../../scenedata/avw/output.exp1/%04d-gpoints.conf
+objectDataPath = ../../../scenedata/avw/output.exp1/%04d-gpoints.conf
 
 
 % -----------------------------------------------------------------------------

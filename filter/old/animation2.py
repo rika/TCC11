@@ -151,20 +151,19 @@ root.update()
 
 # Animation loop
 try:
-    for frame in range(start, end+1):
-        frameNumber.set("Frame: "+str(frame))
-        objects1 = data1.get_objects(frame)
-        objects2 = data2.get_objects(frame)
-        sim.clear()
-        sim.line()
-        for obj in objects1:
-            sim.add(obj)
-        for obj in objects2:
-            sim.add2(obj)
-        root.update() # redraw
-        #time.sleep(1.0/20)
-        print frame
-        sys.stdin.readline()
+    while(1):
+        for frame in range(start, end+1):
+            frameNumber.set("Frame: "+str(frame))
+            objects1 = data1.get_objects(frame)
+            objects2 = data2.get_objects(frame)
+            sim.clear()
+            sim.line()
+            for obj in objects1:
+                sim.add(obj)
+            for obj in objects2:
+                sim.add2(obj)
+            root.update() # redraw
+            time.sleep(1.0/24)
 except TclError:
     pass # to avoid errors when the window is closed
 

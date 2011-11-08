@@ -1,9 +1,18 @@
 #include "Object.hpp"
 
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glut.h>
+
 #include <iostream>
 using namespace std;
 
 Object::Object () {
+    this->frame = -1;
+    this->subject = -1;
+    this->coord.x = 0;
+    this->coord.y = 0;
+    this->height = 0;
 }
 
 Object::Object (int frame, int subject, int x, int y, float height) {
@@ -18,6 +27,14 @@ Object::Object (int frame, int subject, int x, int y, float height) {
     }
 }
 
+Object& Object::operator= (const Object& obj) {
+    frame = obj.frame;
+    subject = obj.subject;
+    coord = obj.coord;
+    height = obj.height;
+    return *this;
+}
+
 bool Object::operator== (Object obj) {
     return (this->frame == obj.frame) &&
         (this->subject == obj.subject) &&
@@ -25,12 +42,14 @@ bool Object::operator== (Object obj) {
         // height == 1.0
 }
 
-Object Object::operator= (Object obj) {
-    this->frame = obj.frame;
-    this->subject = obj.subject;
-    this->coord = obj.coord;
-    this->height = obj.height;
-    return obj;
+void Object::display () {
+    float side = 10;
+    glPushMatrix();
+    glTranslatef(coord.x, coord.y, 0);
+    glColor3f(0.6, 0.6, 0.6);
+    glRectf(-side/2, -side/2, side/2, side/2);
+    glPopMatrix();
+
 }
 
 float dist (Object a, Object b) {

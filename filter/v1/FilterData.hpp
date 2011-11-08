@@ -19,7 +19,7 @@ class FilterData {
     int start, end;
     FilterData(string filePath, int startFrame, int endFrame);
     ~FilterData();
-    Object * getStart();
+    Object getStart();
     list<Object> get(int frame);
     void update(list<Object> trackedSet, list<Object> predictSet);
     void writeResult(string filePath);

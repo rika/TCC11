@@ -81,14 +81,14 @@ bool FilterData::isStart(Object obj) {
     return true;
 }
 
-Object * FilterData::getStart() {
+Object FilterData::getStart() {
     for (int i = 0; i <= end-start-(TWIN_SIZE-1); i++) {
         //cout << "frame: " << i << endl;
         list<Object>::iterator it;
         for (it = frameObjects[i].begin(); it != frameObjects[i].end(); it++)
-            if (isStart(*it)) return &(*it);
+            if (isStart(*it)) return *it;
     }
-    return NULL;
+    return Object(-1, -1, -1, -1, -1);
 }
 
 list<Object> FilterData::get(int frame) {

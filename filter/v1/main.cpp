@@ -19,10 +19,12 @@ int main() {
     FilterData data(INFILE, START_FRAME, END_FRAME);
 
     int id = 0;
-    Object * obj_pt;
-    while ((obj_pt = data.getStart()) != NULL) {
-        cout << "Tracking: " << id << " at (" << obj_pt->coord.x << "," << obj_pt->coord.y << ")"<< endl; 
-        Tracker * tracker = new Tracker(obj_pt, id++);
+    Object obj;
+    while (true) {
+        obj = data.getStart();
+        if (obj.subject == -1) break;
+        cout << "Tracking: " << id << " at (" << obj.coord.x << "," << obj.coord.y << ")" << endl; 
+        Tracker * tracker = new Tracker(obj, id++);
         tracker->track(&data);
         data.update(tracker->trackedSet, tracker->predictSet);
         delete tracker;

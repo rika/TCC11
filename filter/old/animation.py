@@ -139,16 +139,16 @@ root.update()
 
 # Animation loop
 try:
-    for frame in range(start, end+1):
-        frameNumber.set("Frame: "+str(frame))
-        objects = data.get_objects(frame)
-        sim.clear()
-        for obj in objects:
-            sim.add(obj)
-        root.update() # redraw
-        #time.sleep(1.0/20)
-        print frame
-        sys.stdin.readline()
+    while (True):
+        for frame in range(start, end+1):
+            frameNumber.set("Frame: "+str(frame))
+            objects = data.get_objects(frame)
+            sim.clear()
+            for obj in objects:
+                sim.add(obj)
+            root.update() # redraw
+            #time.sleep(1.0/24)
+            sys.stdin.readline()
 except TclError:
     pass # to avoid errors when the window is closed
 

@@ -1,19 +1,22 @@
-CFLAGS = `pkg-config opencv --cflags`
-LIBS   = `pkg-config opencv --libs`
+CFLAGS = -Wall -O2 `pkg-config opencv --cflags`
+LIBS   = `pkg-config opencv --libs` -lGL -lglut -lGLU
 CC     = g++
 
-SRCS = main.cpp Object.cpp FilterData.cpp Tracker.cpp stats.cpp
-MAIN_OBJS = main.o Object.o FilterData.o Tracker.o
+SRCS = main.cpp Object.cpp FilterData.cpp Tracker.cpp stats.cpp animation_filter.cpp
+MAIN_OBJS = Object.o FilterData.o Tracker.o
 
-all: main stats
+all: main stats animation_filter
 
 run:
 	./main
 
-main: ${MAIN_OBJS}
+main: main.o ${MAIN_OBJS}
 	${CC} ${CFLAGS} -o $@ $^ ${LIBS}
 
 stats: stats.o FilterData.o Object.o
+	${CC} ${CFLAGS} -o $@ $^ ${LIBS}
+
+animation_filter: animation_filter.o ${MAIN_OBJS}
 	${CC} ${CFLAGS} -o $@ $^ ${LIBS}
 
 .cpp.o:
@@ -25,6 +28,7 @@ depend:
 clean:
 	rm main stats *.o
 
+animation_filter.o: Object.hpp FilterData.hpp Tracker.hpp
 stats.o: Object.hpp FilterData.hpp
 main.o: Object.hpp FilterData.hpp Tracker.hpp
 Object.o: Object.hpp

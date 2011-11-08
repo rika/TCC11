@@ -12,8 +12,9 @@ class Object {
 
     Object ();
     Object (int frame, int subject, int x, int y, float height);
-    bool operator== (Object obj);
-    Object operator= (Object obj);
+    Object& operator=(const Object& obj);
+    bool operator==(Object obj);
+    void display();
 };
 
 float dist (Object a, Object b);
