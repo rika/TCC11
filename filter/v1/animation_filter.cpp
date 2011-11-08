@@ -9,12 +9,9 @@
 #include "Object.hpp"
 #include "Tracker.hpp"
 
-#define INFILE  "gpoints.conf"
-#define OUTFILE "out.conf"
-#define START_FRAME 1510
-#define END_FRAME   2999
+#define IDLE_INIT_TIME 20  // Tempo de sleep entre frames em milisegundos
 
-#define IDLE_INIT_TIME 100   // Tempo de sleep entre frames em milisegundos
+using namespace std;
 
 int width  = 1152;
 int height = 400;
@@ -58,14 +55,33 @@ float ColorTablef[42][3]={
     {0.25, 0.00, 0.00}
 };*/
 
-using namespace std;
 
-FilterData data = FilterData(INFILE, START_FRAME, END_FRAME);
-int id;
+FilterData * data;
 Tracker * tracker;
+int id;
+int start_frame, end_frame;
+stringstream outfile;
+
+void init(int argc, char* argv[]) {
+    if (argc < 4) {
+        cout << "USAGE: " << argv[0] << " [infile] [start_frame] [end_frame]" << endl;
+        exit(0);
+    }
+    stringstream s(argv[2]);
+    stringstream e(argv[3]);
+
+    if ( (s >> start_frame).fail() || (e >> end_frame).fail()) {
+        cout << "USAGE: " << argv[0] << " [infile] [start_frame] [end_frame]" << endl;
+        exit(0);
+    }
+
+    cout << "Infile: " << argv[1] << " [" << start_frame << ", " << end_frame << "]" << endl;
 
 
-void init() {
+    data = new FilterData(string(argv[1]), start_frame, end_frame);
+    outfile << argv[1] << ".out";
+    cout << "Outfile: " << outfile.str() << endl;
+
     id = 0;
     steptw = (ftR-ftL)/width;
     stepth = (ftT-ftB)/height;
@@ -81,7 +97,7 @@ void display() {
     glLoadIdentity();
 
     if (tracker != NULL)
-        tracker->display(&data);
+        tracker->display(data);
 
     glutSwapBuffers();
 }
@@ -97,9 +113,9 @@ void reshape(int w, int h) {
 void finalize() {
     cout << endl << "DONE ?? REMAINING OBJECTS: " << endl;
 
-    for (int i = START_FRAME; i <= END_FRAME; i++) {
+    for (int i = start_frame; i <= end_frame; i++) {
         cout << "frame " << i << ": ";
-        list<Object> l = data.get(i);
+        list<Object> l = data->get(i);
         list<Object>::iterator it;
         for (it = l.begin(); it != l.end(); it++) {
             cout << " " << (*it).subject;
@@ -107,24 +123,24 @@ void finalize() {
         cout << endl;
     }
 
-    data.writeResult(OUTFILE);
+    data->writeResult(outfile.str());
     exit(0);
 }
 
 void step(int t) {
 
     if (tracker != NULL) {
-        bool done = tracker->step(&data);
+        bool done = tracker->step(data);
 
         if (done) {
-            data.update(tracker->trackedSet, tracker->predictSet);
+            data->update(tracker->trackedSet, tracker->predictSet);
             delete tracker;
             tracker = NULL;
         }
         glutPostRedisplay();
     }
     else {
-        Object obj = data.getStart();
+        Object obj = data->getStart();
         if (obj.subject == -1) finalize();
         cout << "Tracking: " << id << " at (" << obj.coord.x << "," << obj.coord.y << ")" << endl; 
         tracker = new Tracker(obj, id++);
@@ -167,18 +183,19 @@ void keyboard(unsigned char key, int x, int y) {
     }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char* argv[]) {
+    
+    init(argc, argv);
+    argc = 1;
+
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(width, height);
     glutCreateWindow(argv[0]);
     glutDisplayFunc(display);
-    glutTimerFunc(IDLE_INIT_TIME, step, IDLE_INIT_TIME);
     glutReshapeFunc(reshape);
-//    glutMouseFunc(mouse);
+    glutTimerFunc(IDLE_INIT_TIME, step, IDLE_INIT_TIME);
     glutKeyboardFunc(keyboard);
-
-    init();
 
     glutMainLoop();
 

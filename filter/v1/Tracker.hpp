@@ -14,6 +14,9 @@ using namespace std;
 
 class Tracker {
     private:
+    float v_const;
+    float d_threshold;
+    int t_threshold;
     int state;
     bool init;
     list<Object> fails;

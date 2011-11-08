@@ -6,14 +6,10 @@
 
 #define DP_K 4
 #define MP_K 2
-#define SN_K 128
-#define V_K 16
+#define SN_K 256
 
 #define FORWARD 1
 #define BACKWARD -1
-
-#define THRESHOLD 20
-#define D_THRESHOLD 30
 
 float dist(float ax, float ay, float bx, float by) {
     float dx = ax - bx;
@@ -21,9 +17,13 @@ float dist(float ax, float ay, float bx, float by) {
     return sqrt(dx*dx+dy*dy);
 }
 
-Tracker::Tracker (Object obj, int id) {
+Tracker::Tracker (Object obj, int id, float vk, float dt, int tt) {
+    v_const = vk;
+    d_threshold = dt;
+    t_threshold = tt;
     state = FORWARD;
     init = true;
+    lastf = obj.frame;
 
     initObj = obj;
     this->id = id;
@@ -46,15 +46,15 @@ CvConDensation * Tracker::initConDensation (Object obj) {
     CvMat * lower = cvCreateMat (DP_K, 1, CV_32F);
     CvMat * upper = cvCreateMat (DP_K, 1, CV_32F);
 
-    cvmSet(lower, 0, 0, 0);
-    cvmSet(upper, 0, 0, 0);
-    cvmSet(lower, 1, 0, 0);
-    cvmSet(upper, 1, 0, 0);
+    cvmSet(lower, 0, 0, -v_const);
+    cvmSet(upper, 0, 0,  v_const);
+    cvmSet(lower, 1, 0, -v_const);
+    cvmSet(upper, 1, 0,  v_const);
 
-    cvmSet(lower, 2, 0, -V_K);
-    cvmSet(upper, 2, 0,  V_K);
-    cvmSet(lower, 3, 0, -V_K);
-    cvmSet(upper, 3, 0,  V_K);
+    cvmSet(lower, 2, 0, -1.5*v_const);
+    cvmSet(upper, 2, 0,  1.5*v_const);
+    cvmSet(lower, 3, 0, -1.5*v_const);
+    cvmSet(upper, 3, 0,  1.5*v_const);
 
     for (int i = 0; i < 16; i++)
         con->DynamMatr[i] = 0;
@@ -136,9 +136,9 @@ void Tracker::trackAux (CvConDensation * con, FilterData * data, int step) {
 
         // locate
         Object obj;
-        obj = nearest (lasts, px, py, data->get(frame), V_K);
+        obj = nearest (lasts, px, py, data->get(frame), v_const);
         if (obj.subject == -1)
-            obj = nearest (-1, lastx, lasty, data->get(frame), D_THRESHOLD);
+            obj = nearest (-1, lastx, lasty, data->get(frame), d_threshold);
 
         if (obj.subject != -1) {
             lastx = obj.coord.x;
@@ -157,7 +157,7 @@ void Tracker::trackAux (CvConDensation * con, FilterData * data, int step) {
         }
         else {
             nf++;
-            if (nf == THRESHOLD) {
+            if (nf == t_threshold) {
                 cout << "  BREAK!" << endl;
                 break;
             }
@@ -193,8 +193,8 @@ bool Tracker::stepAux (CvConDensation * con, FilterData * data, int step) {
         tframe = initObj.frame+step;
         init = false;
     }
+    cout << "tframe: " << tframe << endl;
     if (tframe < data->end && tframe > data->start) {
-
 
         cout << " [" << tframe << "]" << endl;
         // predict
@@ -205,9 +205,10 @@ bool Tracker::stepAux (CvConDensation * con, FilterData * data, int step) {
 
         // locate
         Object obj;
-        obj = nearest (-1, px, py, data->get(tframe), V_K);
-        if (obj.subject == -1)
-            obj = nearest (-1, lastx, lasty, data->get(tframe), D_THRESHOLD);
+        obj = nearest (-1, px, py, data->get(tframe), v_const);
+        if (obj.subject == -1) {
+            obj = nearest (-1, lastx, lasty, data->get(tframe), d_threshold);
+        }
 
         obj_v.subject = -1;
         if (obj.subject != -1) {
@@ -229,7 +230,7 @@ bool Tracker::stepAux (CvConDensation * con, FilterData * data, int step) {
         }
         else {
             nf++;
-            if (nf == THRESHOLD) {
+            if (nf == t_threshold) {
                 cout << "  BREAK!" << endl;
                 init = true;
                 return true;
@@ -301,8 +302,9 @@ void Tracker::display(FilterData * data) {
     ss << "Frame: " << lastf << " ID: " << id;
     display_str(24, 24, ss.str());
 
-    sq_display (lastx, lasty, 2*D_THRESHOLD, 3);
-    sq_display (px, py, 2*V_K, 4);
+    
+    sq_display (lastx, lasty, 2*d_threshold, 3);
+    sq_display (px, py, 2*v_const, 4);
 
     for (it = l.begin(); it != l.end(); it++) {
         (*it).display();

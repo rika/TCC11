@@ -4,19 +4,25 @@
 #include "FilterData.hpp"
 #include "Object.hpp"
 
-#define START_FRAME 1510
-#define END_FRAME   2999
-
 using namespace std;
 
 int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        cout << "USAGE: " << argv[0] << " [infile]" << endl;
+    int start_frame, end_frame;
+    if (argc != 4) {
+        cout << "USAGE: " << argv[0] << " [infile] [start_frame] [end_frame]" << endl;
         exit(0);
     }
 
-    FilterData data(string(argv[1]), START_FRAME, END_FRAME);
-    cout << "file: " << argv[1] << " [" << START_FRAME << ", " << END_FRAME << "]" << endl;
+    stringstream s(argv[2]);
+    stringstream e(argv[3]);
+
+    if ( (s >> start_frame).fail() || (e >> end_frame).fail()) {
+        cout << "USAGE: " << argv[0] << " [infile] [start_frame] [end_frame]" << endl;
+        exit(0);
+    }
+
+    FilterData data(string(argv[1]), start_frame, end_frame);
+    cout << "file: " << argv[1] << " [" << start_frame << ", " << end_frame << "]" << endl;
 
     int sub[1000];
     for (int i = 0; i < 1000; i++) sub[i] = 0;
@@ -35,7 +41,7 @@ int main(int argc, char *argv[]) {
     pair<double, int> y_min = make_pair(9999, -1);
 
     map<int, Object> lastFrame;
-    for (int i = START_FRAME; i <= END_FRAME; i++) {
+    for (int i = start_frame; i <= end_frame; i++) {
         list<Object> l = data.get(i);
         list<Object>::iterator it;
         list<Object>::iterator jt;
@@ -132,12 +138,12 @@ int main(int argc, char *argv[]) {
     cout << "N max = " << n_max.first << " [" << n_max.second << "]" << endl; 
     cout << "N min = " << n_min.first << " [" << n_min.second << "]" << endl; 
     cout << "N mean = " << n_mean.first << endl;
-    cout << "N frames = " << n_mean.second << endl; 
+    cout << "# frames = " << n_mean.second << endl; 
     cout << "V max = " << v_max.first << " [" << v_max.second << "]" << endl; 
     cout << "V min = " << v_min.first << " [" << v_min.second << "]" << endl; 
     cout << "V mean = " << v_mean.first << endl;
-    cout << "N v = " << v_mean.second << endl; 
-    cout << "N subjects = " << nsub << endl;
+    cout << "# v = " << v_mean.second << endl; 
+    cout << "# subjects = " << nsub << endl;
 
     return 0;
 }
