@@ -360,6 +360,58 @@ void Billboarding::renderFrame(int frame) {
 
   // Render all objects starting from those farthest from the camera plane
   // to avoid rendering errors due to alpha blending and depth buffer
+
+  CvMat * worldToRef = cvCreateMat(3, 3, CV_32FC1);
+  cvInvert(refToWorld, worldToRef);
+
+  cvmSet(p, 0, 0, 7.86);
+  cvmSet(p, 1, 0, 6.67);
+  cvmSet(p, 2, 0, 1.0);
+  cvMatMul(worldToRef, p, r);
+  cout << "r:";
+  for (int i = 0; i < 3; i++)
+      cout << " " << r->data.fl[i];
+  cout << endl;
+  FVV::Object * obj1 = new FVV::Object(0, 1.0, (int)r->data.fl[0], (int)r->data.fl[1]);
+
+  cvmSet(p, 0, 0, -10.29);
+  cvmSet(p, 1, 0, 6.67);
+  cvmSet(p, 2, 0, 1.0);
+  cvMatMul(worldToRef, p, r);
+  cout << "r2:";
+  for (int i = 0; i < 3; i++)
+      cout << " " << r->data.fl[i];
+  cout << endl;
+  FVV::Object * obj2 = new FVV::Object(0, 1.0, (int)r->data.fl[0], (int)r->data.fl[1]);
+
+  cvmSet(p, 0, 0, -10.29);
+  cvmSet(p, 1, 0, -0.56);
+  cvmSet(p, 2, 0, 1.0);
+  cvMatMul(worldToRef, p, r);
+  cout << "r3:";
+  for (int i = 0; i < 3; i++)
+      cout << " " << r->data.fl[i];
+  cout << endl;
+  FVV::Object * obj3 = new FVV::Object(0, 1.0, (int)r->data.fl[0], (int)r->data.fl[1]);
+
+  cvmSet(p, 0, 0, 7.86);
+  cvmSet(p, 1, 0, -0.56);
+  cvmSet(p, 2, 0, 1.0);
+  cvMatMul(worldToRef, p, r);
+  cout << "r3:";
+  for (int i = 0; i < 3; i++)
+      cout << " " << r->data.fl[i];
+  cout << endl;
+  FVV::Object * obj4 = new FVV::Object(0, 1.0, (int)r->data.fl[0], (int)r->data.fl[1]);
+
+  renderObjectDummy(*obj1);
+  renderObjectDummy(*obj2);
+  renderObjectDummy(*obj3);
+  renderObjectDummy(*obj4);
+  delete obj1;
+  delete obj2;
+  delete obj3;
+  delete obj4;
   for (int i = 0; i < zOrdered.size(); i++) {
     if (dummyRender) {
       renderObjectDummy(objects[zOrdered[i].second]);

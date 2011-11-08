@@ -54,7 +54,7 @@ p3world = 4.83, 3.64
 % Starting and ending frame number
 % 1500 2000
 startingFrame = 1510
-endingFrame = 1750
+endingFrame = 1515
 
 % Video Frames per Second
 framesPerSecond = 20
