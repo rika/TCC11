@@ -9,26 +9,38 @@
 
 using namespace std;
 
+void usage (char* argv[]) {
+    cout << "USAGE: " << argv[0] << " [infile] [start_frame] [end_frame] [v_const] [d_threshold] [t_threshold] [l_threshold]" << endl;
+}
+
 int main(int argc, char* argv[]) {
 
     int start_frame, end_frame;
-    if (argc != 4) {
-        cout << "USAGE: " << argv[0] << " [infile] [start_frame] [end_frame]" << endl;
+    float vk, dt;
+    int tt, lt;
+    if (argc != 8) {
+        usage(argv);
         exit(0);
     }
 
-    stringstream s(argv[2]);
-    stringstream e(argv[3]);
+    stringstream ss(argv[2]), se(argv[3]), sv(argv[4]), sd(argv[5]), st(argv[6]), sl(argv[7]);
+    bool fail = false;
+    fail = fail || (ss >> start_frame).fail();
+    fail = fail || (se >> end_frame).fail();
+    fail = fail || (sv >> vk).fail();
+    fail = fail || (sd >> dt).fail();
+    fail = fail || (st >> tt).fail();
+    fail = fail || (sl >> lt).fail();
 
-    if ( (s >> start_frame).fail() || (e >> end_frame).fail()) {
-        cout << "USAGE: " << argv[0] << " [infile] [start_frame] [end_frame]" << endl;
+    if (fail) {
+        usage(argv);
         exit(0);
     }
 
     FilterData data(string(argv[1]), start_frame, end_frame);
 
-    stringstream outfile(argv[1]);
-    outfile << ".out";
+    stringstream outfile;
+    outfile << argv[1] << ".out";
 
     int id = 0;
     Object obj;
@@ -36,7 +48,7 @@ int main(int argc, char* argv[]) {
         obj = data.getStart();
         if (obj.subject == -1) break;
         cout << "Tracking: " << id << " at (" << obj.coord.x << "," << obj.coord.y << ")" << endl; 
-        Tracker * tracker = new Tracker(obj, id++);
+        Tracker * tracker = new Tracker(obj, id++, vk, dt, tt, lt);
        
         bool done = false;
         while (!done) done = tracker->step(&data);

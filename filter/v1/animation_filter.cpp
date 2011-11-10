@@ -24,61 +24,45 @@ float ftT= -50;
 float steptw, stepth;
 
 bool paused = true;
-/*
-float ColorTablef[42][3]={
-    {1.00, 1.00, 1.00},    {0.00, 1.00, 1.00},
-    {0.85, 0.85, 0.85},    {0.00, 0.85, 0.85},
-    {0.70, 0.70, 0.70},    {0.00, 0.70, 0.70},
-    {0.55, 0.55, 0.55},    {0.00, 0.55, 0.55},
-    {0.40, 0.40, 0.40},    {0.00, 0.40, 0.40},
-    {0.25, 0.25, 0.25},    {0.00, 0.25, 0.25},
-
-    {1.00, 1.00, 0.00},    {1.00, 0.00, 1.00},
-    {0.85, 0.85, 0.00},    {0.85, 0.00, 0.85},
-    {0.70, 0.70, 0.00},    {0.70, 0.00, 0.70},
-    {0.55, 0.55, 0.00},    {0.55, 0.00, 0.55},
-    {0.40, 0.40, 0.00},    {0.40, 0.00, 0.40},
-    {0.25, 0.25, 0.00},    {0.25, 0.00, 0.25},
-
-    {0.00, 0.00, 1.00},    {0.00, 1.00, 0.00},
-    {0.00, 0.00, 0.85},    {0.00, 0.85, 0.00},
-    {0.00, 0.00, 0.70},    {0.00, 0.70, 0.00},
-    {0.00, 0.00, 0.55},    {0.00, 0.55, 0.00},
-    {0.00, 0.00, 0.40},    {0.00, 0.40, 0.00},
-    {0.00, 0.00, 0.25},    {0.00, 0.25, 0.00},
-
-    {1.00, 0.00, 0.00},
-    {0.85, 0.00, 0.00},
-    {0.70, 0.00, 0.00},
-    {0.55, 0.00, 0.00},
-    {0.40, 0.00, 0.00},
-    {0.25, 0.00, 0.00}
-};*/
-
 
 FilterData * data;
 Tracker * tracker;
 int id;
+
+void usage (char* argv[]) {
+    cout << "USAGE: " << argv[0] << " [infile] [start_frame] [end_frame] [v_const] [d_threshold] [t_threshold] [l_threshold]" << endl;
+}
+
 int start_frame, end_frame;
+float vk, dt;
+int tt, lt;
 stringstream outfile;
 
 void init(int argc, char* argv[]) {
-    if (argc < 4) {
-        cout << "USAGE: " << argv[0] << " [infile] [start_frame] [end_frame]" << endl;
-        exit(0);
-    }
-    stringstream s(argv[2]);
-    stringstream e(argv[3]);
 
-    if ( (s >> start_frame).fail() || (e >> end_frame).fail()) {
-        cout << "USAGE: " << argv[0] << " [infile] [start_frame] [end_frame]" << endl;
+    if (argc != 8) {
+        usage(argv);
         exit(0);
     }
+
+    stringstream ss(argv[2]), se(argv[3]), sv(argv[4]), sd(argv[5]), st(argv[6]), sl(argv[7]);
+    bool fail = false;
+    fail = fail || (ss >> start_frame).fail();
+    fail = fail || (se >> end_frame).fail();
+    fail = fail || (sv >> vk).fail();
+    fail = fail || (sd >> dt).fail();
+    fail = fail || (st >> tt).fail();
+    fail = fail || (sl >> lt).fail();
+
+    if (fail) {
+        usage(argv);
+        exit(0);
+    }
+
+    data = new FilterData(string(argv[1]), start_frame, end_frame);
 
     cout << "Infile: " << argv[1] << " [" << start_frame << ", " << end_frame << "]" << endl;
 
-
-    data = new FilterData(string(argv[1]), start_frame, end_frame);
     outfile << argv[1] << ".out";
     cout << "Outfile: " << outfile.str() << endl;
 
@@ -143,7 +127,7 @@ void step(int t) {
         Object obj = data->getStart();
         if (obj.subject == -1) finalize();
         cout << "Tracking: " << id << " at (" << obj.coord.x << "," << obj.coord.y << ")" << endl; 
-        tracker = new Tracker(obj, id++);
+        tracker = new Tracker(obj, id++, vk, dt, tt, lt);
     }
     if (!paused)
         glutTimerFunc(t, step, t);

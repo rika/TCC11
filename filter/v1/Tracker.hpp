@@ -17,6 +17,7 @@ class Tracker {
     float v_const;
     float d_threshold;
     int t_threshold;
+    int l_threshold;
     int state;
     bool init;
     list<Object> fails;
@@ -30,7 +31,6 @@ class Tracker {
     Object initObj;
     CvConDensation * conDenF;
     CvConDensation * conDenB;
-    void trackAux(CvConDensation * con, FilterData * data, int step);
     CvConDensation * initConDensation(Object obj);
     void updateProbDens (CvConDensation * con, Object obj);
     
@@ -38,9 +38,8 @@ class Tracker {
     list<Object> trackedSet;
     list<Object> predictSet;
 
-    Tracker (Object obj, int id);
+    Tracker (Object obj, int id, float vk, float dt, int tt, int lt);
     ~Tracker();
-    void track (FilterData * data);
 
     void display (FilterData * data);
     bool step (FilterData * data);

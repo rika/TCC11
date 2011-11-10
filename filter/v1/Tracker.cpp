@@ -17,10 +17,11 @@ float dist(float ax, float ay, float bx, float by) {
     return sqrt(dx*dx+dy*dy);
 }
 
-Tracker::Tracker (Object obj, int id, float vk, float dt, int tt) {
+Tracker::Tracker (Object obj, int id, float vk, float dt, int tt, int lt) {
     v_const = vk;
     d_threshold = dt;
     t_threshold = tt;
+    l_threshold = lt;
     state = FORWARD;
     init = true;
     lastf = obj.frame;
@@ -96,12 +97,6 @@ void Tracker::updateProbDens (CvConDensation * con, Object obj) {
     }
 }
 
-void Tracker::track (FilterData * data) {
-    trackAux(conDenF, data, FORWARD);
-    trackAux(conDenB, data, BACKWARD);
-    if (predictSet.size() < 20) predictSet.clear();
-}
-
 Object nearest (int subject, int x, int y, list<Object> l, int d_max) {
     list<Object>::iterator it;
     Object obj;
@@ -118,54 +113,6 @@ Object nearest (int subject, int x, int y, list<Object> l, int d_max) {
     return obj;
 }
 
-void Tracker::trackAux (CvConDensation * con, FilterData * data, int step) {
-    list<Object> fails;
-    list<Object>::iterator it;
-
-    int nf = 0;
-    int lastx = (int) con->State[0];
-    int lasty = (int) con->State[1];
-    int lasts = initObj.subject;
-    for (int frame = initObj.frame+step; frame < data->end && frame > data->start; frame += step) {
-        cout << " [" << frame << "]" << endl;
-        // predict
-        cvConDensUpdateByTime(con);
-        int px = (int) con->State[0];
-        int py = (int) con->State[1];
-        cout << " PREDICT at (" << px << ","<< py << ")" << endl;
-
-        // locate
-        Object obj;
-        obj = nearest (lasts, px, py, data->get(frame), v_const);
-        if (obj.subject == -1)
-            obj = nearest (-1, lastx, lasty, data->get(frame), d_threshold);
-
-        if (obj.subject != -1) {
-            lastx = obj.coord.x;
-            lasty = obj.coord.y;
-            lasts = obj.subject;
-            cout << " FOUND obj at (" << obj.coord.x << ","<< obj.coord.y << ")" << endl;
-            trackedSet.push_back(obj);
-            predictSet.push_back(Object(frame, id, px, py, initObj.height));
-            for (it = fails.begin(); it != fails.end(); it++) {
-                cout << "  HOLE at (" << (*it).coord.x << ","<< (*it).coord.y << ")" << endl;
-                predictSet.push_back(*it);
-            }
-            fails.clear();
-            nf = 0;
-            updateProbDens (con, obj);
-        }
-        else {
-            nf++;
-            if (nf == t_threshold) {
-                cout << "  BREAK!" << endl;
-                break;
-            }
-            fails.push_back(Object(frame, id, px, py, initObj.height));
-        }
-    }
-}
-
 bool Tracker::step (FilterData * data) {
     bool done;
     if (state == FORWARD) {
@@ -176,7 +123,7 @@ bool Tracker::step (FilterData * data) {
     // state == BACKWARD
     done = stepAux(conDenB, data, BACKWARD);
     if (done) {
-        if (predictSet.size() < 20) predictSet.clear();
+        if ((int)predictSet.size() < l_threshold) predictSet.clear();
         return true;
     }
     return false;
