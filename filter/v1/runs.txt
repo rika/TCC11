@@ -1,0 +1,5 @@
+EXP : [program] [infile] [start] [end] [vk] [dt] [tt]
+
+1   : ./main avw_gpoints.conf 1300 9005 10 25 10 100
+2   : ./main avw_gpoints.conf 1300 9005 10 20 8 45
+
