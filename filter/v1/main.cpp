@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
         exit(0);
     }
 
-    FilterData data(string(argv[1]), start_frame, end_frame);
+    FilterData data(string(argv[1]), start_frame, end_frame, dt, lt);
 
     stringstream outfile;
     outfile << argv[1] << ".out";
@@ -57,18 +57,21 @@ int main(int argc, char* argv[]) {
         delete tracker;
     }
 
-    cout << endl << "DONE ?? REMAINING OBJECTS: " << endl;
+    cout << endl << "REMAINING OBJECTS: " << endl;
 
     for (int i = start_frame; i <= end_frame; i++) {
-        cout << "frame " << i << ": ";
         list<Object> l = data.get(i);
-        list<Object>::iterator it;
-        for (it = l.begin(); it != l.end(); it++) {
-            cout << " " << (*it).subject;
+        if (l.size() > 0) {
+            cout << "frame " << i << ": ";
+            list<Object>::iterator it;
+            for (it = l.begin(); it != l.end(); it++) {
+                cout << " " << (*it).subject;
+            }
+            cout << endl;
         }
-        cout << endl;
     }
 
+    data.smooth();
     data.writeResult(outfile.str());
 
     return 0;

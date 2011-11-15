@@ -18,6 +18,7 @@ class Tracker {
     float d_threshold;
     int t_threshold;
     int l_threshold;
+    bool found;
     int state;
     bool init;
     list<Object> fails;

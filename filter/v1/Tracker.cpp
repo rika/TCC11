@@ -89,12 +89,58 @@ CvConDensation * Tracker::initConDensation (Object obj) {
 
 
 void Tracker::updateProbDens (CvConDensation * con, Object obj) {
+    /*
+    float sumX = 0;
+    float sumY = 0;
+    for (int i = 0; i < con->SamplesNum; i++) {
+        sumX += con->flSamples[i][0];
+        sumY += con->flSamples[i][1];
+    }
+    float meanX = sumX /(float)con->SamplesNum;
+    float meanY = sumY /(float)con->SamplesNum;
+
+    float sqmX = 0;
+    float sqmY = 0;
+    for (int i = 0; i < con->SamplesNum; i++) {
+        sqmX += (con->flSamples[i][0]-meanX)*(con->flSamples[i][0]-meanX);
+        sqmY += (con->flSamples[i][1]-meanY)*(con->flSamples[i][1]-meanY);
+    }
+    float varianceX = sqmX /(float)con->SamplesNum-1;
+    float varianceY = sqmY /(float)con->SamplesNum-1;
+    if (varianceX == 0) varianceX = 1;
+    if (varianceY == 0) varianceY = 1;
+
+	for(int i = 0; i < con->SamplesNum; i++){
+		float ProbX = 1;
+		float ProbY = 1;
+		
+		float DifX = obj.coord.x - con->flSamples[i][0];
+		float DifY = obj.coord.y - con->flSamples[i][1];
+		
+		ProbX *= (float) exp( -1 * (DifX) * (DifX) / ( 2 * varianceX ) );
+		ProbY *= (float) exp( -1  * (DifY) * (DifY) / ( 2 * varianceY ) );
+
+		con->flConfidence[i] = ProbX * ProbY ;
+
+		if (abs(DifX) < 5 || abs(DifY) < 5)
+			con->flConfidence[i] = 1;
+    }
+    */
+
     for (int i = 0; i < con->SamplesNum; i++) {
         float d = dist (obj.coord.x, obj.coord.y,
                 con->flSamples[i][0], con->flSamples[i][1]);
-        if (d < 1) d = 1;
+        //if (d < 1) d = 1;
         con->flConfidence[i] = 1/d;
     }
+
+    //normalize
+    float sum = 0;
+    for (int i = 0; i < con->SamplesNum; i++)
+        sum += con->flConfidence[i];
+    for (int i = 0; i < con->SamplesNum; i++)
+        con->flConfidence[i] /= sum;
+
 }
 
 void getVars(list<Object> l, float* varX, float* varY) {
@@ -147,11 +193,11 @@ Object nearest (int subject, int x, int y, list<Object> l, int d_max) {
     list<Object>::iterator it;
     Object obj;
     obj.subject = -1;
-    float D = d_max;
+    float D = 1.1*d_max;
     for (it = l.begin(); it != l.end(); it++) {
         if ((*it).subject == subject) return (*it);
         float d = dist(x, y, (*it).coord.x, (*it).coord.y);
-        if (d < D) {
+        if (d <= D) {
             D = d;
             obj = (*it);
         }
@@ -180,6 +226,8 @@ bool Tracker::stepAux (CvConDensation * con, FilterData * data, int step) {
 
     if (init) {
         nf = 0;
+        found = true;
+        fails.clear();
         lastx = (int) con->State[0];
         lasty = (int) con->State[1];
         //lasts = initObj.subject;
@@ -191,10 +239,12 @@ bool Tracker::stepAux (CvConDensation * con, FilterData * data, int step) {
 
         cout << " [" << tframe << "]" << endl;
         // predict
-        cvConDensUpdateByTime(con);
-        px = (int) con->State[0];
-        py = (int) con->State[1];
-        cout << " PREDICT at (" << px << ","<< py << ")" << endl;
+        if (found) {
+            cvConDensUpdateByTime(con);
+            px = (int) con->State[0];
+            py = (int) con->State[1];
+            cout << " PREDICT at (" << px << ","<< py << ")" << endl;
+        }
 
         // locate
         Object obj;
@@ -205,6 +255,7 @@ bool Tracker::stepAux (CvConDensation * con, FilterData * data, int step) {
 
         obj_v.subject = -1;
         if (obj.subject != -1) {
+            found = true;
             obj_v = obj;
             lastx = obj.coord.x;
             lasty = obj.coord.y;
@@ -223,6 +274,7 @@ bool Tracker::stepAux (CvConDensation * con, FilterData * data, int step) {
             //updateProbDens2 (con, obj, data->get(tframe));
         }
         else {
+            found = false;
             nf++;
             if (nf == t_threshold) {
                 cout << "  BREAK!" << endl;

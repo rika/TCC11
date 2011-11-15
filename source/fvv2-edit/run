@@ -1,0 +1,3 @@
+#!/bin/bash -v
+
+./main pets2006-part1.dat 

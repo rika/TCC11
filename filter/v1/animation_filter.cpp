@@ -9,7 +9,7 @@
 #include "Object.hpp"
 #include "Tracker.hpp"
 
-#define IDLE_INIT_TIME 20  // Tempo de sleep entre frames em milisegundos
+#define IDLE_INIT_TIME 60  // Tempo de sleep entre frames em milisegundos
 
 using namespace std;
 
@@ -59,7 +59,7 @@ void init(int argc, char* argv[]) {
         exit(0);
     }
 
-    data = new FilterData(string(argv[1]), start_frame, end_frame);
+    data = new FilterData(string(argv[1]), start_frame, end_frame, dt, lt);
 
     cout << "Infile: " << argv[1] << " [" << start_frame << ", " << end_frame << "]" << endl;
 
@@ -95,18 +95,21 @@ void reshape(int w, int h) {
 }
 
 void finalize() {
-    cout << endl << "DONE ?? REMAINING OBJECTS: " << endl;
+    cout << endl << "REMAINING OBJECTS: " << endl;
 
     for (int i = start_frame; i <= end_frame; i++) {
-        cout << "frame " << i << ": ";
         list<Object> l = data->get(i);
-        list<Object>::iterator it;
-        for (it = l.begin(); it != l.end(); it++) {
-            cout << " " << (*it).subject;
+        if (l.size() > 0) {
+            cout << "frame " << i << ": ";
+            list<Object>::iterator it;
+            for (it = l.begin(); it != l.end(); it++) {
+                cout << " " << (*it).subject;
+            }
+            cout << endl;
         }
-        cout << endl;
     }
 
+    data->smooth();
     data->writeResult(outfile.str());
     exit(0);
 }

@@ -1,2 +1,2 @@
+python animation2.py ../v1/pets_gpoints.conf ../v1/pets_gpoints.conf.out 1510 2999
 
-python animation.py out.conf 1510 2999

@@ -4,13 +4,12 @@
 
 #include "FilterData.hpp"
 
-#define TWIN_SIZE 10
-#define WIN_DIST 50
-
 using namespace std;
 
-FilterData::FilterData(string filePath, int startFrame, int endFrame) {
+FilterData::FilterData(string filePath, int startFrame, int endFrame, float dt, int lt) {
 
+    d_threshold = dt;
+    l_threshold = lt;
     ifstream infile;
     int n, subject, x, y;
     float height;
@@ -53,37 +52,34 @@ FilterData::~FilterData() {
 }
 
 bool FilterData::isStart(Object obj) {
-    //cout << " isStart(" << obj.subject << ")" << endl;
     list<Object>::iterator it;
-    //cout << "  frame: " << obj.frame << endl;
     int frame = obj.frame-start;
     for (it = frameObjects[frame].begin(); it != frameObjects[frame].end(); it++) {
-        //cout << "  comparing with: " << (*it).subject << endl;
-        if (obj.subject != (*it).subject && dist(obj, *it) < WIN_DIST)
+        if (obj.subject != (*it).subject && dist(obj, *it) < d_threshold)
             return false;
     }
 
-    Object * p;
-    Object * q;
-    p = &obj;
+    Object p;
+    Object q;
+    p = obj;
 
-    for (frame = obj.frame-start+1; frame < obj.frame-start+TWIN_SIZE; frame++) {
-        //cout << "  frame: " << frame+start << endl;
+    for (frame = obj.frame-start+1; frame < obj.frame-start+l_threshold; frame++) {
+        if (frame > end) return false;
+        q = Object(-1, -1, -1, -1, -1);
         for (it = frameObjects[frame].begin(); it != frameObjects[frame].end(); it++) {
-            //cout << "  comparing with: " << (*it).subject << endl;
-            q = NULL;
-            if (dist(*p, *it) < WIN_DIST) {
-                if (q != NULL) return false;
-                q = &(*it);
+            if (dist(p, *it) < d_threshold) {
+                if (q.subject != -1) return false;
+                q = (*it);
             }
         }
+        if (q.subject == -1) return false;
+        p = q;
     }
     return true;
 }
 
 Object FilterData::getStart() {
-    for (int i = 0; i <= end-start-(TWIN_SIZE-1); i++) {
-        //cout << "frame: " << i << endl;
+    for (int i = 0; i <= end-start-(l_threshold-1); i++) {
         list<Object>::iterator it;
         for (it = frameObjects[i].begin(); it != frameObjects[i].end(); it++)
             if (isStart(*it)) return *it;
@@ -96,7 +92,6 @@ list<Object> FilterData::get(int frame) {
         cout << "FilterData.get: Invalid frame " << frame << endl;
         exit(-1);
     }
-    //cout << frame << " " << start << " " << end << endl;
     return frameObjects[frame - start];
 }
 
@@ -128,4 +123,42 @@ void FilterData::writeResult(string filePath) {
             outfile << (*it).subject << " " << (*it).height << " " << (*it).coord.x << " " << (*it).coord.y << endl;
     }
     outfile.close();
+}
+
+#define MAX_OBJS 1000
+
+void FilterData::smooth() {
+    vector<Object> * objects = new vector<Object>[MAX_OBJS];
+
+    for (int frame = start; frame <= end; frame++) {
+        list<Object> l = resultObjects[frame-start];
+        list<Object>::iterator it;
+        for (it = l.begin(); it != l.end(); it++) {
+            int sub = (*it).subject;
+            objects[sub].push_back((*it));
+        }
+        resultObjects[frame-start].clear();
+    }
+
+    for (int i = 0; i < MAX_OBJS; i++) {
+        if (objects[i].size() >= 5) {
+            for (unsigned j = 2; j < objects[i].size()-2; j++) {
+                Object p1 = objects[i].at(j-2);
+                Object p2 = objects[i].at(j-1);
+                Object o3 = objects[i].at(j);
+                Object a2 = objects[i].at(j+1);
+                Object a1 = objects[i].at(j+2);
+                float x = (p1.coord.x + 2*p2.coord.x + 3*o3.coord.x +
+                    2*a2.coord.x + a1.coord.x) / 9.0;
+                float y = (p1.coord.y + 2*p2.coord.y + 3*o3.coord.y +
+                    2*a2.coord.y + a1.coord.y) / 9.0;
+
+                o3.coord.x = (int)x;
+                o3.coord.y = (int)y;
+                resultObjects[o3.frame-start].push_back(o3);
+            }
+        }
+    
+    }
+
 }

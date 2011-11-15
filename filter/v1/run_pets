@@ -1,0 +1,4 @@
+#!/bin/bash -v
+
+./animation_filter pets_gpoints.conf 1510 2999 10 50 20 30
+

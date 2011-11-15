@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
         exit(0);
     }
 
-    FilterData data(string(argv[1]), start_frame, end_frame);
+    FilterData data(string(argv[1]), start_frame, end_frame, 0, 0);
     cout << "file: " << argv[1] << " [" << start_frame << ", " << end_frame << "]" << endl;
 
     int sub[1000];
