@@ -33,6 +33,7 @@ class Tracker {
     CvConDensation * conDenB;
     CvConDensation * initConDensation(Object obj);
     void updateProbDens (CvConDensation * con, Object obj);
+    void updateProbDens2 (CvConDensation * con, Object obj, list<Object> l);
     
     public:
     list<Object> trackedSet;

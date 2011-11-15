@@ -6,7 +6,7 @@
 
 #define DP_K 4
 #define MP_K 2
-#define SN_K 256
+#define SN_K 100
 
 #define FORWARD 1
 #define BACKWARD -1
@@ -97,6 +97,52 @@ void Tracker::updateProbDens (CvConDensation * con, Object obj) {
     }
 }
 
+void getVars(list<Object> l, float* varX, float* varY) {
+    list<Object>::iterator it;
+    float meanX = 0;
+    float meanY = 0;
+    for (it = l.begin(); it != l.end(); it++) {
+        meanX += (*it).coord.x;
+        meanY += (*it).coord.x;
+    }
+    meanX /= l.size();
+    meanY /= l.size();
+
+    *varX = 0;
+    *varY = 0;
+    for (it = l.begin(); it != l.end(); it++) {
+        *varX += ((*it).coord.x - meanX)*((*it).coord.x - meanX);
+        *varY += ((*it).coord.y - meanY)*((*it).coord.y - meanY);
+    }
+    *varX /= l.size()-1;
+    *varY /= l.size()-1;
+}
+
+void Tracker::updateProbDens2 (CvConDensation * con, Object obj, list<Object> l) {
+    list<Object>::iterator it;
+    float varX, varY;
+    getVars(l, &varX, &varY);
+
+    float sum = 0;
+    for (int i = 0; i < con->SamplesNum; i++) {
+        float probX = 1;
+        float probY = 1;
+        for (it = l.begin(); it != l.end(); it++) {
+            float dx = (*it).coord.x - con->flSamples[i][0];
+            float dy = (*it).coord.y - con->flSamples[i][1];
+
+            probX *= (float) exp(-1*dx*dx / (2*varX));
+            probY *= (float) exp(-1*dy*dy / (2*varY));
+        }
+        float d = dist (obj.coord.x, obj.coord.y,
+                con->flSamples[i][0], con->flSamples[i][1]);
+        if (d < 1) d = 1;
+        sum += con->flConfidence[i] *= probX*probY * (1/d);
+    }
+    for (int i = 0; i < con->SamplesNum; i++)
+        con->flConfidence[i] /= sum;
+}
+
 Object nearest (int subject, int x, int y, list<Object> l, int d_max) {
     list<Object>::iterator it;
     Object obj;
@@ -174,6 +220,7 @@ bool Tracker::stepAux (CvConDensation * con, FilterData * data, int step) {
             fails.clear();
             nf = 0;
             updateProbDens (con, obj);
+            //updateProbDens2 (con, obj, data->get(tframe));
         }
         else {
             nf++;
@@ -220,7 +267,7 @@ void sq_display(float x, float y, float side, int color) {
 void Tracker::displayCon (CvConDensation * con) {
     // amostras
     for (int i = 0; i < con->SamplesNum; i++)
-        sq_display (con->flSamples[i][0], con->flSamples[i][1], 1.0, 2);
+        sq_display (con->flSamples[i][0], con->flSamples[i][1], 2.0, 2);
     // predicao
     sq_display(px, py, 10.0, 1); 
     // medida
@@ -250,8 +297,8 @@ void Tracker::display(FilterData * data) {
     display_str(24, 24, ss.str());
 
     
-    sq_display (lastx, lasty, 2*d_threshold, 3);
-    sq_display (px, py, 2*v_const, 4);
+//    sq_display (lastx, lasty, 2*d_threshold, 3);
+//    sq_display (px, py, 2*v_const, 4);
 
     for (it = l.begin(); it != l.end(); it++) {
         (*it).display();

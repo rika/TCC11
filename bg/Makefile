@@ -5,7 +5,10 @@ CC     = g++
 SRCS = background.cpp bgpets.cpp BGS.cpp
 OBJS = background.o bgpets.o BGS.o
 
-all: BGPets background
+all: BGPets background BGavw
+
+BGavw: bgavw.o BGS.o
+	${CC} ${CFLAGS} -o $@ $^ ${LIBS}
 
 BGPets: bgpets.o BGS.o
 	${CC} ${CFLAGS} -o $@ $^ ${LIBS}
@@ -24,4 +27,4 @@ clean:
 
 background.o: BGS.h
 bgpets.o: BGS.h
-
+bgavw.o: BGS.h

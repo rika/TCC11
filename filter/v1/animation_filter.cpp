@@ -13,13 +13,13 @@
 
 using namespace std;
 
-int width  = 1152;
-int height = 400;
+int width  = 1000;
+int height = 440;
 
-float ftL = -50;
-float ftB = 450;
-float ftR= 1150;
-float ftT= -50;
+float ftL = 0;
+float ftB = 440;
+float ftR= 1000;
+float ftT= 0;
 
 float steptw, stepth;
 
