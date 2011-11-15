@@ -1,5 +1,6 @@
 *.o
 *.out
+*.jpg
 main
 stats
 animation_filter
